@@ -1,5 +1,5 @@
 # SAGI summer school python lectures and exercises
-Put introduction here 
+Put introduction here
 
 ## Installation
 
@@ -27,9 +27,9 @@ To get started with this project, you need to have [list any prerequisites] inst
 1. **Create a Conda Environment:**
    - In your terminal, create a new Conda environment by running:
      ```sh
-     conda create -n myenv python=3.8
+     conda create -n sagi python=3.11
      ```
-   - Replace `myenv` with the name you want for your environment and `3.8` with the version of Python you need.
+   - `sagi` is the name of the environment we will use for the lessons.
 
 2. **Activate the Environment:**
    - Activate your environment by running:
@@ -54,14 +54,19 @@ To get started with this project, you need to have [list any prerequisites] inst
    - Navigate to the notebook files in this repository and open them in Jupyter Notebook.
    - You can now run the cells in the notebook to execute the code.
 
-## Install this repository
+## Install this repository -> This is a work in progress
 
-1. **Clone this repository:**
+1. **Activate the Environment**
+- Activate your environment by running:
+  ```sh
+  conda activate myenv
+  ```
+2. **Clone this repository:**
    ```sh
    git clone https://github.com/loganfoote/citkid
    ```
-2. **Navigate to the repository directory**
-3. **Install the package using pip:**
+3. **Navigate to the repository directory**
+4. **Install the package using pip:**
    ```sh
    python -m pip install .
    ```
