@@ -53,3 +53,15 @@ To get started with this project, you need to have [list any prerequisites] inst
 5. **Open and Run Notebooks:**
    - Navigate to the notebook files in this repository and open them in Jupyter Notebook.
    - You can now run the cells in the notebook to execute the code.
+
+## Install this repository
+
+1. **Clone this repository:**
+   ```sh
+   git clone https://github.com/loganfoote/citkid
+   ```
+2. **Navigate to the repository directory**
+3. **Install the package using pip:**
+   ```sh
+   python -m pip install .
+   ```
