@@ -1,0 +1,12 @@
+name: sagi
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - jupyter
+  - pyvisa
+  - astropy
+  - numpy
+  - scipy
+prefix: /home/sam/anaconda3/envs/sagi
