@@ -1,12 +1,21 @@
-name: sagi
+name: sagi_test
 channels:
   - conda-forge
+  - anaconda
   - defaults
 dependencies:
-  - python=3.11
-  - jupyter
+  - healpy
+  - h5py=3.10.0  
+  - pandas=2.2.1
+  - scikit-rf
+  - pycraf=2.0.1
+  - openpyxl=3.1.4
+  - jupyterlab=4.1.4
+  - tqdm
+  - astropy=6.0.0
   - pyvisa
-  - astropy
   - numpy
-  - scipy
+  - scipy 
+  - matplotlib 
+  - python
 prefix: /home/sam/anaconda3/envs/sagi
