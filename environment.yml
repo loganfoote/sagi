@@ -1,4 +1,4 @@
-name: sagi_test
+name: sagi
 channels:
   - conda-forge
   - anaconda
