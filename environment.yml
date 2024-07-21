@@ -5,7 +5,6 @@ channels:
   - defaults
 dependencies:
   - scipy=1.13.1
-  - healpy=1.17.3
   - h5py=3.10.0  
   - pandas=2.2.1
   - pycraf=2.0.1
