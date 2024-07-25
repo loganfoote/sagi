@@ -4,7 +4,7 @@ from time import sleep
 import matplotlib.pyplot as plt
 from simple_fft import simple_fft
 
-def connect(ip_address = '192.168.1.164'):
+def connect(ip_address = '192.168.2.121'):
     """
     Connects to the oscilloscope through the ethernet interface 
     and confirms the connection by printing the instrument ID 
@@ -36,36 +36,36 @@ def set_xoffset(inst, xoffset):
     """
     inst.write(f'HOR_POSITION {xoffset}s')
     
-def set_yscale(inst, yscale, ch = 1):
+def set_yscale(inst, yscale, channel = 1):
     """
     Sets the vertical scale on the given channel
 
     :param inst: pyvisa resource
     :param yscale: float, vertical scale in V / div
-    :param ch: int, channel index, must be in [1, 2, 3, 4]
+    :param channel: int, channel index, must be in [1, 2, 3, 4]
     """
-    inst.write(f'C{ch}:VOLT_DIV {yscale}V')
+    inst.write(f'C{channel}:VOLT_DIV {yscale}V')
     
-def set_yoffset(inst, yoffset, ch = 1):
+def set_yoffset(inst, yoffset, channel = 1):
     """
     Sets the vertical offset on the given channel
 
     :param inst: pyvisa resource
     :param yoffset: float, vertical offset in V
-    :param ch: int, channel index, must be in [1, 2, 3, 4]
+    :param channel: int, channel index, must be in [1, 2, 3, 4]
     """
-    inst.write(f'C{ch}:OFFSET {yoffset}v')
+    inst.write(f'C{channel}:OFFSET {yoffset}v')
     
-def set_amplification(inst, amplification, ch = 1):
+def set_amplification(inst, amplification, channel = 1):
     """
     Sets the amplification on the given channel
 
     :param inst: pyvisa resource
     :param amplification: float, amplification
         Must be in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100]
-    :param ch: int, channel index, must be in [1, 2, 3, 4]
+    :param channel: int, channel index, must be in [1, 2, 3, 4]
     """
-    inst.write(f'C{ch}:ATTENUATION {amplification}')
+    inst.write(f'C{channel}:ATTENUATION {amplification}')
 
 def set_trigger_mode(inst, mode = 'AUTO'):
     """
@@ -80,8 +80,18 @@ def set_trigger_mode(inst, mode = 'AUTO'):
         raise ValueError('Invalid mode')
     inst.write(f'TRIG_MODE {mode}')
 
-def initialize(inst):
+def set_channel_state(inst, channel, state):
     """
+    Sets the channel state to ON or OFF 
+
+    :param inst: pyvisa resource
+    :param channel: int, channel index, must be in [1, 2, 3, 4] 
+    :param state: str, channel state, 'ON' or 'OFF'
+    """
+    inst.write(f'C{channel}:TRACE {state}')
+
+def initialize(inst):
+    """ functions
     Initializes the oscilloscope instrument to the following 
     values on every channel 
 
@@ -94,39 +104,16 @@ def initialize(inst):
     """
     set_xscale(inst, 10e-6)
     set_xoffset(inst, 0)
-    for ch in range(4):
-        set_yscale(inst, 1, ch = ch)
-        set_yoffset(inst, 0, ch = ch)
-        set_amplification(inst, 1, ch = ch) 
+    for ch in range(1, 5):
+        set_yscale(inst, 1, channel = ch)
+        set_yoffset(inst, 0, channel = ch)
+        set_amplification(inst, 1, channel = ch) 
+    for ch in range(2, 5):
+        set_channel_state(inst, ch, 'OFF')
+    set_channel_state(inst, 1, 'ON')
     set_trigger_mode(inst, 'AUTO')
 
-def get_xscale(inst):
-    """
-    Gets the horizontal scale
-
-    :param inst: pyvisa resource
-    
-    :return xscale: float, horizontal scale in seconds / div
-    """
-    response = inst.query('TIME_DIV?')
-    response = response.split('TDIV ')[1].replace('S\n', '')
-    xscale = float(response)
-    return xscale
-    
-def get_xoffset(inst):
-    """
-    Gets the horizontal offset
-
-    :param inst: pyvisa resource
-    
-    :return xoffset: float, horizontal scale in seconds
-    """
-    response = inst.query('HOR_POSITION?')
-    response = response.split('HPOS ')[1].replace('S\n', '')
-    xoffset = float(response)
-    return xoffset
-    
-def get_yscale(inst, ch = 1):
+    def get_yscale(inst, ch = 1):
     """
     Gets the vertical scale on the given channel
 
@@ -153,6 +140,32 @@ def get_yoffset(inst, ch = 1):
     response = response.split('OFST ')[1].replace('V\n', '')
     yoffset = float(response)
     return yoffset
+
+def get_xscale(inst):
+    """
+    Gets the horizontal scale
+
+    :param inst: pyvisa resource
+    
+    :return xscale: float, horizontal scale in seconds / div
+    """
+    response = inst.query('TIME_DIV?')
+    response = response.split('TDIV ')[1].replace('S\n', '')
+    xscale = float(response)
+    return xscale
+    
+def get_xoffset(inst):
+    """
+    Gets the horizontal offset
+
+    :param inst: pyvisa resource
+    
+    :return xoffset: float, horizontal scale in seconds
+    """
+    response = inst.query('HOR_POSITION?')
+    response = response.split('HPOS ')[1].replace('S\n', '')
+    xoffset = float(response)
+    return xoffset
 
 def get_amplification(inst, ch = 1):
     """
@@ -181,6 +194,19 @@ def get_trigger_mode(inst):
     mode = response
     return mode
 
+def get_channel_state(inst, channel):
+    """
+    Gets the channel state to ON or OFF 
+
+    :param inst: pyvisa resource
+    :param channel: int, channel index, must be in [1, 2, 3, 4] 
+    
+    :return state: str, channel state, 'ON' or 'OFF'
+    """
+    response = inst.query(f'C{channel}:TRACE?')
+    state = response.split('TRA ')[1].replace('\n', '')
+    return state
+
 def create_log(xscale, xoffset, yscale, yoffset, 
                amplification, trigger_mode):
     """
@@ -194,7 +220,7 @@ def create_log(xscale, xoffset, yscale, yoffset,
     :param amplification: float, amplification
     :param trigger_mode: str, trigger mode
     """
-    log = "# ------ SIGLENT SDS 1104X-E Oscilloscope Settings ------# \n" 
+    log = "------------- SIGLENT SDS 1104X-E -------------\n" 
     log += f'xscale: {xscale} s / div\n'
     log += f'xoffset: {xoffset} s\n'
     log += f'yscale: {yscale} V / div\n'
