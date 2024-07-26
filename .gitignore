@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 lessons/instrument_control/footeLectures/
+environment.yml
