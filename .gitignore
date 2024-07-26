@@ -160,4 +160,8 @@ cython_debug/
 #.idea/
 
 lessons/instrument_control/footeLectures/
+lessons/instrument_control/lesson7/binary_data.npy
+lessons/instrument_control/lesson7/data.csv
+lessons/instrument_control/lesson7/filename.txt
+lessons/instrument_control/lesson8/pset3_voltage.txt
 environment.yml
