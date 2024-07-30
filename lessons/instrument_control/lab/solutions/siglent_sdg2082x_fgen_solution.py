@@ -150,3 +150,4 @@ def create_log(channel, wave_type, freq, amp, offset):
     log += f"Amplitude: {amp} Volts peak-to-peak\n"
     log += f"Offset: {offset} Volts\n"
     return log
+    
