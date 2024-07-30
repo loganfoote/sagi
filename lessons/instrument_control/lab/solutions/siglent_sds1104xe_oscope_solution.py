@@ -220,7 +220,7 @@ def create_log(xscale, xoffset, yscale, yoffset,
     :param amplification: float, amplification
     :param trigger_mode: str, trigger mode
     """
-    log = "------------- SIGLENT SDS 1104X-E -------------\n" 
+    log = "# ---------------- SIGLENT SDS 1104X-E ----------------- #\n" 
     log += f'xscale: {xscale} s / div\n'
     log += f'xoffset: {xoffset} s\n'
     log += f'yscale: {yscale} V / div\n'
@@ -239,14 +239,18 @@ def capture_data(inst):
     :return time: np.array, time array in seconds
     :return voltage: np.array, voltage array in V
     """
-    fsample = inst.query('SARA?')
+    try:
+        fsample = inst.query('SARA?')
+    except:
+        sleep(0.2)
+        fsample = inst.query('SARA?')
     fsample = float(fsample.split(' ')[1].replace('Sa/s\n', ''))
     tsample = 1 / fsample
 
     vdiv = get_yscale(inst)
     voffset = get_yoffset(inst)
 
-    sleep(0.1)
+    sleep(0.2)
     raw_data = inst.query_binary_values('C1:WF? DAT2', datatype = 'B')
     data = []
     for d in raw_data:
