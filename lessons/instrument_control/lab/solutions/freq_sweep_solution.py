@@ -3,6 +3,7 @@ import numpy as np
 from time import sleep
 import siglent_sds1104xe_oscope_solution as osc 
 import siglent_sdg2082x_fgen_solution as fgen
+from simple_fft import simple_fft
 
 def capture_freq_sweep(out_directory, osc_inst, fgen_inst, start_freq, end_freq, npoints, yscale):
     """
@@ -41,8 +42,6 @@ def capture_freq_sweep(out_directory, osc_inst, fgen_inst, start_freq, end_freq,
     log += f'end frequency: {end_freq} Hz\n' 
     log += f'number of points: {npoints}\n'
     # save log file
-    out_directory = '/home/vn-neu-daq01/SAGI2024/data/group0/sweep_00/'
-    out_directory = r'C:\Users\logan\Downloads\temp/'
     log_path = out_directory + 'freqsweep.log' 
     if os.path.exists(log_path):
         raise FileExistsError(f'{log_path} already exists')
@@ -73,3 +72,49 @@ def set_freq(fgen_inst, osc_inst, freq):
     osc.set_xscale(osc_inst, xscale)
     # sleep
     sleep(0.1)
+
+def get_freq_from_log(path):
+    """
+    Creates the frequency array corresponding to a geometric 
+    frequency sweep from the log file.
+
+    :param path: str, log path 
+
+    :return frequencies: np.array, array of frequencies in Hz 
+    """
+    with open(path, 'r') as file:
+        lines = file.readlines()
+    fstart = [l for l in lines if l.startswith('start frequency: ')][0].replace('start frequency: ', '')
+    fstart = float(fstart.replace(' Hz\n', ''))
+    fend = [l for l in lines if l.startswith('end frequency: ')][0].replace('end frequency: ', '')
+    fend = float(fend.replace(' Hz\n', ''))
+    npoints = [l for l in lines if l.startswith('number of points: ')][0].replace('number of points: ', '')
+    npoints = int(npoints.replace('\n', ''))
+    frequencies = np.geomspace(fstart, fend, npoints)
+    return frequencies
+
+def import_freq_sweep(out_directory):
+    """
+    Import frequency sweep data and extract the transmission amplitude 
+
+    :param frequencies: np.array, array of frequencies in Hz 
+    :param out_directory: str, directory containing the data 
+    :param amp: float, function generator output in V 
+
+    :return good_freqs: np.array, array of frequencies from the data, with 
+        bad data sets removed 
+    :return transmission: np.array, array of transmission data         
+    """
+    frequencies = get_freq_from_log(out_directory + 'freqsweep.log')
+    transmission = []
+    good_freqs = []
+    for index, frequency in enumerate(frequencies):
+        time, voltage = np.load(out_directory + f'freqsweep_{index:03d}.npy') 
+        if len(time):
+            tsample = time[1] - time[0]
+            f, y = simple_fft(tsample, voltage)
+            ix = np.argmin(abs(f - frequency))
+            transmission.append(y[ix])
+            good_freqs.append(frequency)
+    good_freqs, transmission = np.array(good_freqs), np.array(transmission)
+    return good_freqs, transmission
